@@ -1,0 +1,27 @@
+name: Daily Heartbeat Commit
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs at 00:00 every day
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Update Heartbeat File
+        run: |
+          echo "Last Heartbeat: $(date -u)" > heartbeat.txt
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add heartbeat.txt
+          git commit -m "chore: daily heartbeat commit [skip ci]" || echo "No changes to commit"
+          git push
